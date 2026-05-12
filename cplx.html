@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résolution et vérification d'équations cubiques et quartiques complexes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.6.0/math.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .complex-input {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 50px;
+        }
+        input {
+            padding: 5px;
+            width: 150px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Résolution et vérification des équation cubiques et quartiques</br>𝑓(𝑧) = 𝒂𝑧³ + 𝒃𝑧² + 𝒄𝑧 + 𝒅 = 0 et 𝒂𝑧⁴ + 𝒃𝑧³ + 𝒄𝑧² + 𝒅𝑧 + 𝒆 = 0</h3>
+        <div class="input-group">
+            <label for="a_real">𝒂 :</label>
+            <div class="complex-input">
+                <input type="number" id="a_real" placeholder="Réel" value="1" step="any">
+                <span>+</span>
+                <input type="number" id="a_imag" placeholder="Imag" value="1" step="any">
+                <span>i</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="b_real">𝒃 :</label>
+            <div class="complex-input">
+                <input type="number" id="b_real" placeholder="Réel" value="1" step="any">
+                <span>+</span>
+                <input type="number" id="b_imag" placeholder="Imag" value="1" step="any">
+                <span>i</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="c_real">𝒄 :</label>
+            <div class="complex-input">
+                <input type="number" id="c_real" placeholder="Réel" value="1" step="any">
+                <span>+</span>
+                <input type="number" id="c_imag" placeholder="Imag" value="1" step="any">
+                <span>i</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="d_real">𝒅 :</label>
+            <div class="complex-input">
+                <input type="number" id="d_real" placeholder="Réel" value="1" step="any">
+                <span>+</span>
+                <input type="number" id="d_imag" placeholder="Imag" value="1" step="any">
+                <span>i</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="e_real">𝒆 :</label>
+            <div class="complex-input">
+                <input type="number" id="e_real" placeholder="Réel" value="1" step="any">
+                <span>+</span>
+                <input type="number" id="e_imag" placeholder="Imag" value="1" step="any">
+                <span>i</span>
+            </div>
+        </div>
+        <button onclick="solveAndVerifyCubic()">Résoudre 3</button>
+	  <button onclick="hasard();">Hasard</button>
+        <button onclick="solveAndVerifyQuartic()">Résoudre 4</button>
+	  <button onclick="reels();">Réels</button>
+        <div id="result" class="result"></div>
+    </div>
+
+<script>
+'use strict';
+
+const indices = '₁₂₃₄'; // 𝑎𝑏𝑐𝑑𝑒𝑓𝑔𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧
+const puissances = ['','','²','³','⁴'] // 𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛
+
+function rnd(){return Math.random()*20-10;}
+function rnd0(){let a=rnd();return (a!=0)?a:rnd0();}
+
+function get(s){
+	let S = document.getElementById(s).value;
+	try{return Number.parseFloat(S);}
+	catch(e){document.getElementById(s).value = 0;}
+	return 0;
+}
+
+function set(s,v){document.getElementById(s).value=v;}
+
+function hasard(){
+	set('a_real',rnd0());
+	set('a_imag',rnd());
+	set('b_real',rnd());
+	set('b_imag',rnd());
+	set('c_real',rnd());
+	set('c_imag',rnd());
+	set('d_real',rnd());
+	set('d_imag',rnd());
+	set('e_real',rnd());
+	set('e_imag',rnd());
+	document.getElementById('result').innerHTML='';
+}
+
+function reels(){
+	set('a_real',rnd0());
+	set('a_imag',0);
+	set('b_real',rnd());
+	set('b_imag',0);
+	set('c_real',rnd());
+	set('c_imag',0);
+	set('d_real',rnd());
+	set('d_imag',0);
+	set('e_real',rnd());
+	set('e_imag',0);
+	document.getElementById('result').innerHTML='';
+}
+
+// Constantes racines cubiques de l'unité avec 1
+const J = math.complex(-0.5, Math.sqrt(3)/2);
+const J2 = math.complex(-0.5, -Math.sqrt(3)/2);
+
+// Affiche un nombre complexe
+function displayComplex(z) {
+	if((Math.abs(z.im) < 1e-9)&&(Math.abs(z.re) < 1e-9))return 0;
+	if (Math.abs(z.im) < 1e-9) return z.re.toFixed(6);
+	if (Math.abs(z.re) < 1e-9) return `${z.im.toFixed(6)}i`;
+	const sign = z.im >= 0 ? '+' : '-';
+	return `${z.re.toFixed(6)} ${sign} ${Math.abs(z.im).toFixed(6)}i`;
+}
+
+// Vérifie si un nombre complexe est presque nul
+function isZero(z, epsilon = 1e-9) {
+	return Math.abs(z.re) < epsilon && Math.abs(z.im) < epsilon;
+}
+
+// Évalue f(x) = a*x^3 + b*x^2 + c*x + d
+function evaluatePolynomial(x, a, b, c, d) {
+	return math.evaluate("((a*x + b)*x + c)*x + d", { x, a, b, c, d }); // ou "a*x^3 + b*x^2 + c*x + d"
+}
+
+// Évalue f(x) = a*x^4 + b*x^3 + c*x^2 + d*x + e
+function evaluatePolynomial4(x, a, b, c, d, e) {
+	return math.evaluate("(((a*x + b)*x + c)*x + d)*x + e", { x, a, b, c, d, e });
+}
+
+// Résout une équation cubique (az³ + bz² + cz + d = 0)
+function solveCubic(a, b, c, d) {
+	// Si a est nul, on résout une équation quadratique
+	if (isZero(a)) return solveQuadratic(b, c, d);
+
+	// Passage à la forme réduite x³ + px + q = 0
+	const p = math.evaluate("(3*a*c - b*b) / (3*a*a)", { a, b, c });
+
+	const q = math.evaluate("(2*b*b*b - 9*a*b*c + 27*a*a*d) / (27*a*a*a)", { a, b, c, d });
+
+	// Calcul du discriminant de Cardan
+	const Δ = math.evaluate("q*q/4 + p*p*p/27", { p, q });
+	const δ = math.sqrt(Δ);
+
+	// Calcul de u et v
+	const u3 = math.evaluate("δ - q/2", { δ, q });
+	const u = math.cbrt(u3);
+
+	let v = isZero(u)?math.cbrt(math.unaryMinus(q)):math.evaluate("-p / (3*u)", { p, u });
+
+	// Décalage pour revenir à z (z = x - b/3a)
+	const shift = math.evaluate("b / (3*a)", { a, b });
+
+	// Les trois racines de l'équation
+	const z1 = math.evaluate("u + v - shift", { u, v, shift });
+	const z2 = math.evaluate("u*J + v*J2 - shift", { u, v, J, J2, shift });
+	const z3 = math.evaluate("u*J2 + v*J - shift", { u, v, J, J2, shift });
+
+	return [z1, z2, z3];
+}
+
+// Résout une équation cubique (az³ + bz² + cz + d = 0)
+function solveQuartic(a, b, c, d, e) {
+	if (isZero(a)) return solveCubic(b,c,d,e);
+	if((isZero(b))&&(isZero(d)))
+	{
+		const sol = solveQuadratic(a, c, e);
+		const x = math.sqrt(sol[0]);
+		const y = math.sqrt(sol[1]);
+		return [x,y,math.unaryMinus(x),math.unaryMinus(y)];
+	}
+	const p = math.evaluate("(8*a*c-3*b*b)/(8*a*a)",{a,b,c});
+	const q = math.evaluate("(8*a*a*d+b*b*b-4*a*b*c)/(8*a*a*a)",{a,b,c,d});
+	const r = math.evaluate("(16*a*b*b*c-64*a*a*b*d-3*b*b*b*b+256*a*a*a*e)/(256*a*a*a*a)",{a,b,c,d,e});
+	const shift = math.evaluate("b/(4*a)",{a,b});
+	let deux = math.evaluate("2*p",{p});
+	let trois = math.evaluate("p*p - 4*r",{p,r});
+	let quatre = math.evaluate("-q*q",{q});
+	const s3 = solveCubic(1, deux, trois, quatre); // (1, 2*p, p*p-4*r, -q*q)
+	let F = s3[0];
+	if(isZero(F))F=s3[1];
+	if(isZero(F))F=s3[2];
+	const f = math.sqrt(F);
+	let un = math.evaluate("-F - 2*p + 2*q/f",{F,p,q,f});
+	deux   = math.evaluate("-F - 2*p - 2*q/f",{F,p,q,f});
+	un = math.sqrt(un);
+	deux = math.sqrt(deux);
+	const z1 = math.evaluate("(-f + un)/2 - shift",{f,un,shift});
+	const z2 = math.evaluate("(-f - un)/2 - shift",{f,un,shift});
+	const z3 = math.evaluate("( f + deux)/2 - shift",{f,deux,shift});
+	const z4 = math.evaluate("( f - deux)/2 - shift",{f,deux,shift});
+	return[z1,z2,z3,z4];
+}
+
+// Résout une équation quadratique (az² + bz + c = 0)
+function solveQuadratic(a, b, c) {
+	if (isZero(a)) {
+        // Équation linéaire : bz + c = 0
+        if (isZero(b)) {
+            if (isZero(c))
+                return [math.complex(0, 0)]; // Infinité de solutions, return 0
+            else
+		{
+			alert("Equation impossible, pas de solutions");
+			return []; // pas de solution
+		}
+        }
+        return [math.evaluate("-c / b", { b, c })];
+    }
+    // Calcul du discriminant
+    const Δ = math.evaluate("b*b - 4*a*c", { a, b, c });
+    const δ = math.sqrt(Δ);
+
+    // Solutions
+    const x1 = math.evaluate("(-b + δ) / (2*a)", { a, b, δ });
+
+    const x2 = math.evaluate("(-b - δ) / (2*a)", { a, b, δ });
+
+    return [x1, x2];
+}
+
+// Fonction appelée par le bouton pour résoudre et vérifier l'équation cubique
+function solveAndVerifyCubic() {
+    const a = math.complex(get('a_real'),get('a_imag')) ;
+    const b = math.complex(get('b_real'),get('b_imag')) ;
+    const c = math.complex(get('c_real'),get('c_imag')) ;
+    const d = math.complex(get('d_real'),get('d_imag')) ;
+
+    const solutions = solveCubic(a, b, c, d);
+    let resultHTML = "<table><tr><td><h3 align=center>Solutions :</h3><ul>";
+    solutions.forEach((sol, i) => {
+        resultHTML += `<li>𝒛${indices[i]} = ${displayComplex(sol)}</li>`;
+    });
+    resultHTML += "</ul></td><td><h3 align=right>Vérifications :</h3><ul>";
+    solutions.forEach((sol, i) => {
+        const fSol = evaluatePolynomial(sol, a, b, c, d);
+        resultHTML += `<li>𝑓(𝒛${indices[i]}) = ${displayComplex(fSol)}</li>`;
+    });
+    document.getElementById('result').innerHTML = resultHTML + "</ul></td></tr></table>";
+}
+
+function solveAndVerifyQuartic() {
+    const a = math.complex(get('a_real'),get('a_imag')) ;
+    const b = math.complex(get('b_real'),get('b_imag')) ;
+    const c = math.complex(get('c_real'),get('c_imag')) ;
+    const d = math.complex(get('d_real'),get('d_imag')) ;
+    const e = math.complex(get('e_real'),get('e_imag')) ;
+
+	const solutions = solveQuartic(a, b, c, d, e);
+	let resultHTML = "<table><tr><td><h3 align=center>Solutions :</h3><ul>";
+	solutions.forEach((sol, i) => {
+		resultHTML += `<li>𝒛${indices[i]} = ${displayComplex(sol)}</li>`;
+	});
+	resultHTML += "</ul></td><td><h3 align=right>Vérifications :</h3><ul>";
+	solutions.forEach((sol, i) => {
+		const fSol = evaluatePolynomial4(sol, a, b, c, d, e);
+		resultHTML += `<li>𝑓(𝒛${indices[i]}) = ${displayComplex(fSol)}</li>`;
+	});
+	document.getElementById('result').innerHTML = resultHTML + "</ul></td></tr></table>";
+}
+</script>
+</body>
+</html>
