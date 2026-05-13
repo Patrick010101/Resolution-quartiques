@@ -18,7 +18,7 @@ on pose F = f² donc F^3 + 2pF² + (p^2-4r)F - q² = 0 que l'on sait résoudre (
 
 soit F une solution de cette équation cubique (et donc f = sqrt(F))
 
-en "simplifiant", on obtient les 4 solutions de notre équayion réduite
+en "simplifiant", on obtient les 4 solutions dans C de notre équation réduite
 
 xi = (± f ± sqrt(-f² - 2p ± 2q/f)) / 2
 
