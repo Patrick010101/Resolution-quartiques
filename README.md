@@ -1,3 +1,5 @@
+Méthode d'Abbati :
+
 Posons l'équation réduite liée à az^4 + bz^3 + cz^2 + dz + e = 0 (x = z - b / 4a)
 
 x^4 + px^2 + qx + r = (x² + fx + g)(x² - fx + h) = 0
